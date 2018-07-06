@@ -42,33 +42,29 @@ export const move = (player, position) => {
   };
 };
 
-function bad(state, action) {
+export function bad(state, action) {
   console.log('THIS IS THE STATE', state)
   console.log('THIS IS THE ACTION', action)
-  // it can't access the array by bracket notation
 
-  if (action.type === MOVE) {
-    if (action.player !== state.turn) return `It's not your turn!`
+  if (action.type !== MOVE) return
+  if (action.player !== state.turn) return `It's not your turn!`
+  if (action.position.length !== 2) return `Position is invalid`
 
-    if (Array.isArray(action.position)) {
-      // console.log('ACTION POSITION', action.position)
-      if (action.position.length !== 2) return `Position is invalid`
-      if (action.position[0] > 2 || action.postion[0] < 0) {
-        return `Position is invalid`
-      } else if (action.position[1] > 2 || action.position[1] < 0) {
-        return `Position is invalid`
-      }
-    } else {
-      return `Position is invalid`
-    }
+  const row = action.position[0];
+  const col = action.position[1];
 
-    if (state.board.getIn(action.position)) {
-      return `That square is already taken!`
-    }
+  if (row > 2 || row < 0) {
+    return `Position is invalid`
   }
-
+  if (col > 2 || col < 0) {
+    return `Position is invalid`
+  }
+  if (state.board.hasIn(action.position)) {
+    return `That square is already taken!`
+  }
   return null
 }
+
 
 function winner(board) {
   // use streak function to check coords for each possible win condition
@@ -105,7 +101,7 @@ function streak(board, firstCoord, ...remainingCoords) {
   const coords = [...remainingCoords]
   for (let i = 0; i <coords.length; i++){
     if (board.getIn(coords[i]) !== playerVal){
-      return undefined;
+      return null;
     }
   }
   return playerVal;
